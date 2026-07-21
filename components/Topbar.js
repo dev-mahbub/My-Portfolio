@@ -122,7 +122,7 @@ export default function Topbar({ profile, authed, onLogin, onLogout, data }) {
       }));
   })();
 
-  const initials = (profile?.name || "ME")
+  const initials = "ME"
     .split(" ")
     .map((w) => w[0])
     .slice(0, 2)
