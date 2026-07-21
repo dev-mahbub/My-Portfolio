@@ -7,6 +7,8 @@ const SECTION_TITLES = {
   profile: "Edit Profile",
   skills: "Edit Skills",
   projects: "Edit Projects",
+  experience: "Edit Experience",
+  education: "Edit Education",
   highlights: "Edit Highlights",
   contact: "Edit Contact",
   languages: "Edit Languages",
@@ -53,6 +55,12 @@ export default function EditPanel({
             onSave={onSave}
             onUpload={onUpload}
           />
+        )}
+        {section === "experience" && (
+          <ExperienceEditor data={data.experience || []} onSave={onSave} />
+        )}
+        {section === "education" && (
+          <EducationEditor data={data.education || []} onSave={onSave} />
         )}
         {section === "highlights" && (
           <ListEditor
@@ -568,6 +576,200 @@ function ProjectsEditor({ data = [], onSave, onUpload }) {
       <div className="form-actions">
         <button type="submit" className="btn btn-primary">
           Save projects
+        </button>
+      </div>
+    </form>
+  );
+}
+
+/* ============ EXPERIENCE EDITOR ============ */
+function ExperienceEditor({ data = [], onSave }) {
+  const [items, setItems] = useState(data);
+
+  const update = (id, key, val) =>
+    setItems((arr) => arr.map((e) => (e.id === id ? { ...e, [key]: val } : e)));
+  const add = () =>
+    setItems((arr) => [
+      ...arr,
+      {
+        id: "ex" + Date.now(),
+        role: "New Role",
+        company: "",
+        location: "",
+        period: "",
+        desc: "",
+      },
+    ]);
+  const remove = (id) => setItems((arr) => arr.filter((e) => e.id !== id));
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSave("experience", items);
+      }}
+    >
+      {items.map((e) => (
+        <div
+          key={e.id}
+          style={{
+            borderBottom: "1px solid var(--li-border)",
+            paddingBottom: "0.75rem",
+            marginBottom: "0.75rem",
+          }}
+        >
+          <div className="edit-row">
+            <input
+              className="input"
+              value={e.role}
+              onChange={(ev) => update(e.id, "role", ev.target.value)}
+              placeholder="Role"
+              style={{ flex: 2 }}
+            />
+            <button
+              type="button"
+              className="btn btn-danger btn-sm"
+              onClick={() => remove(e.id)}
+            >
+              ✕
+            </button>
+          </div>
+          <div className="field">
+            <label>Company</label>
+            <input
+              className="input"
+              value={e.company || ""}
+              onChange={(ev) => update(e.id, "company", ev.target.value)}
+              placeholder="Company"
+            />
+          </div>
+          <div className="field">
+            <label>Location</label>
+            <input
+              className="input"
+              value={e.location || ""}
+              onChange={(ev) => update(e.id, "location", ev.target.value)}
+              placeholder="Location"
+            />
+          </div>
+          <div className="field">
+            <label>Period</label>
+            <input
+              className="input"
+              value={e.period || ""}
+              onChange={(ev) => update(e.id, "period", ev.target.value)}
+              placeholder="e.g. Jan 2023 - Present"
+            />
+          </div>
+          <div className="field">
+            <label>Description</label>
+            <textarea
+              className="textarea"
+              value={e.desc || ""}
+              onChange={(ev) => update(e.id, "desc", ev.target.value)}
+              placeholder="What you did, tech used, achievements…"
+            />
+          </div>
+        </div>
+      ))}
+      <button type="button" className="btn btn-outline btn-sm" onClick={add}>
+        + Add experience
+      </button>
+      <div className="form-actions">
+        <button type="submit" className="btn btn-primary">
+          Save experience
+        </button>
+      </div>
+    </form>
+  );
+}
+
+/* ============ EDUCATION EDITOR ============ */
+function EducationEditor({ data = [], onSave }) {
+  const [items, setItems] = useState(data);
+
+  const update = (id, key, val) =>
+    setItems((arr) => arr.map((d) => (d.id === id ? { ...d, [key]: val } : d)));
+  const add = () =>
+    setItems((arr) => [
+      ...arr,
+      {
+        id: "edu" + Date.now(),
+        degree: "New Degree",
+        school: "",
+        period: "",
+        desc: "",
+      },
+    ]);
+  const remove = (id) => setItems((arr) => arr.filter((d) => d.id !== id));
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSave("education", items);
+      }}
+    >
+      {items.map((d) => (
+        <div
+          key={d.id}
+          style={{
+            borderBottom: "1px solid var(--li-border)",
+            paddingBottom: "0.75rem",
+            marginBottom: "0.75rem",
+          }}
+        >
+          <div className="edit-row">
+            <input
+              className="input"
+              value={d.degree}
+              onChange={(ev) => update(d.id, "degree", ev.target.value)}
+              placeholder="Degree / Course"
+              style={{ flex: 2 }}
+            />
+            <button
+              type="button"
+              className="btn btn-danger btn-sm"
+              onClick={() => remove(d.id)}
+            >
+              ✕
+            </button>
+          </div>
+          <div className="field">
+            <label>School / Institution</label>
+            <input
+              className="input"
+              value={d.school || ""}
+              onChange={(ev) => update(d.id, "school", ev.target.value)}
+              placeholder="School"
+            />
+          </div>
+          <div className="field">
+            <label>Period</label>
+            <input
+              className="input"
+              value={d.period || ""}
+              onChange={(ev) => update(d.id, "period", ev.target.value)}
+              placeholder="e.g. 2016 - 2020"
+            />
+          </div>
+          <div className="field">
+            <label>Description</label>
+            <textarea
+              className="textarea"
+              value={d.desc || ""}
+              onChange={(ev) => update(d.id, "desc", ev.target.value)}
+              placeholder="Optional details"
+            />
+          </div>
+        </div>
+      ))}
+      <button type="button" className="btn btn-outline btn-sm" onClick={add}>
+        + Add education
+      </button>
+      <div className="form-actions">
+        <button type="submit" className="btn btn-primary">
+          Save education
         </button>
       </div>
     </form>

@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Icon from "@/components/Icons";
 
 export default function Topbar({ profile, authed, onLogin, onLogout }) {
+  const pathname = usePathname();
   const [active, setActive] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
@@ -22,7 +24,7 @@ export default function Topbar({ profile, authed, onLogin, onLogout }) {
     .toUpperCase();
 
   useEffect(() => {
-    const ids = ["home", "about", "projects", "skills", "contact"];
+    const ids = ["home", "skills", "projects", "contact"];
     const onScroll = () => {
       let cur = "home";
       for (const id of ids) {
@@ -49,9 +51,8 @@ export default function Topbar({ profile, authed, onLogin, onLogout }) {
 
   const nav = [
     { id: "home", label: "Home", Icon: Icon.Home },
-    { id: "about", label: "About", Icon: Icon.User },
-    { id: "projects", label: "Projects", Icon: Icon.Briefcase },
     { id: "skills", label: "Skills", Icon: Icon.Brain },
+    { id: "projects", label: "Projects", Icon: Icon.Briefcase },
     { id: "contact", label: "Contact", Icon: Icon.Mail },
   ];
 
@@ -88,6 +89,27 @@ export default function Topbar({ profile, authed, onLogin, onLogout }) {
     onLogout && onLogout();
   };
 
+  // Smooth-scroll to a section on the home page.
+  // - For "home", always go to the very top (and re-run even if already there).
+  // - For other sections, scroll so the heading sits just below the sticky topbar.
+  const handleNavClick = (e, id) => {
+    if (pathname !== "/") return; // let the browser navigate to /#id first
+    e.preventDefault();
+    const TOPBAR_OFFSET = 80;
+    const target =
+      id === "home"
+        ? 0
+        : (() => {
+            const el = document.getElementById(id);
+            return el ? Math.max(0, el.offsetTop - TOPBAR_OFFSET) : 0;
+          })();
+    window.scrollTo({ top: target, behavior: "smooth" });
+    // keep URL hash in sync without a hard jump
+    if (window.history.replaceState) {
+      window.history.replaceState(null, "", `#${id}`);
+    }
+  };
+
   return (
     <header className="topbar">
       <div className="topbar-inner">
@@ -103,8 +125,11 @@ export default function Topbar({ profile, authed, onLogin, onLogout }) {
           {nav.map((n) => (
             <a
               key={n.id}
-              href={`#${n.id}`}
-              className={`nav-item ${active === n.id ? "active" : ""}`}
+              href={pathname === "/" ? `#${n.id}` : `/#${n.id}`}
+              className={`nav-item ${
+                pathname === "/" && active === n.id ? "active" : ""
+              }`}
+              onClick={(e) => handleNavClick(e, n.id)}
             >
               <n.Icon size={22} />
               <span className="nav-label">{n.label}</span>
@@ -113,7 +138,10 @@ export default function Topbar({ profile, authed, onLogin, onLogout }) {
 
           {/* Dashboard link — admin only */}
           {authed && (
-            <a href="/dashboard" className="nav-item">
+            <a
+              href="/dashboard"
+              className={`nav-item ${pathname === "/dashboard" ? "active" : ""}`}
+            >
               <Icon.Briefcase size={22} />
               <span className="nav-label">Dashboard</span>
             </a>

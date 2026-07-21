@@ -9,8 +9,8 @@ export default function SkillsCard({ skills = [], authed, onEdit }) {
   const skill = skills.find((s) => s.id === active);
 
   return (
-    <section className="card" id="skills">
-      <div className="card-head">
+    <section className="card card-overflow" id="skills">
+      <div className="card-head ">
         <h2>
           <Icon.Brain size={18} className="inline-ico" /> Skills
         </h2>

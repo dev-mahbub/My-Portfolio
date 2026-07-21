@@ -127,11 +127,6 @@ export default function Portfolio({ initialData, initialAuthed = false }) {
             authed={authed}
             onEdit={() => setEditing("skills")}
           />
-          <LanguagesCard
-            languages={data.languages}
-            authed={authed}
-            onEdit={() => setEditing("languages")}
-          />
         </aside>
 
         <section className="right-col">
@@ -159,6 +154,11 @@ export default function Portfolio({ initialData, initialAuthed = false }) {
             highlights={data.highlights}
             authed={authed}
             onEdit={() => setEditing("highlights")}
+          />
+          <LanguagesCard
+            languages={data.languages}
+            authed={authed}
+            onEdit={() => setEditing("languages")}
           />
           <ContactCard
             contact={data.contact}
