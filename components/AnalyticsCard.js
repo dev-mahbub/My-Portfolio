@@ -11,7 +11,7 @@ import Icon from "@/components/Icons";
 export default function AnalyticsCard({ authed, onEdit }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   useEffect(() => {
     if (!authed) return;

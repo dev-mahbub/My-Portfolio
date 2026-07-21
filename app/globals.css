@@ -227,9 +227,9 @@ button {
 }
 
 .card-overflow {
-  overflow-y: scroll;
-  height: 220px;
-  max-height: 100%;
+  overflow-y: auto;
+  height: auto;
+  max-height: 220px;
 }
 .card-head {
   display: flex;
@@ -566,7 +566,7 @@ button {
 .upload-box {
   border: 2px dashed var(--li-border);
   border-radius: 8px;
-  padding: 1rem;
+  padding: 0.75rem;
   text-align: center;
   cursor: pointer;
   background: #fafbfc;
@@ -773,7 +773,7 @@ button {
     max-height: none;
     overflow: visible;
   }
-  .search-box {
+  .search-wrap {
     display: none;
   }
   .nav-item {
@@ -845,7 +845,9 @@ button {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
-  right: 0;
+  min-width: 320px;
+  width: max-content;
+  max-width: 420px;
   background: #fff;
   border: 1px solid var(--li-border);
   border-radius: 8px;
@@ -885,6 +887,32 @@ button {
 .search-result-desc {
   font-size: 0.76rem;
   color: var(--li-text-soft);
+}
+.search-group {
+  margin-bottom: 0.2rem;
+}
+.search-group:last-child {
+  margin-bottom: 0;
+}
+.search-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--li-blue-dark);
+  padding: 0.5rem 0.6rem 0.3rem;
+  border-bottom: 1px solid var(--li-border);
+}
+.search-group-count {
+  background: var(--li-hover);
+  color: var(--li-text-soft);
+  border-radius: 999px;
+  padding: 0.05rem 0.45rem;
+  font-size: 0.66rem;
+  font-weight: 700;
 }
 .search-no-results {
   padding: 0.75rem;

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Icon from "@/components/Icons";
 
-export default function Topbar({ profile, authed, onLogin, onLogout }) {
+export default function Topbar({ profile, authed, onLogin, onLogout, data }) {
   const pathname = usePathname();
   const [active, setActive] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -14,7 +14,113 @@ export default function Topbar({ profile, authed, onLogin, onLogout }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const menuRef = useRef(null);
+  const searchRef = useRef(null);
+
+  // Build a searchable index from portfolio data
+  const searchIndex = (() => {
+    const idx = [];
+    if (!data) return idx;
+    // Profile
+    if (data.profile) {
+      idx.push({
+        label: data.profile.name,
+        sub: data.profile.headline,
+        section: "home",
+        type: "Profile",
+      });
+    }
+    // Skills
+    (data.skills || []).forEach((s) =>
+      idx.push({
+        label: s.name,
+        sub: s.desc,
+        section: "skills",
+        type: "Skill",
+      }),
+    );
+    // Experience
+    (data.experience || []).forEach((e) =>
+      idx.push({
+        label: e.role,
+        sub: `${e.company || ""} ${e.period || ""}`.trim(),
+        section: "experience",
+        type: "Experience",
+      }),
+    );
+    // Projects
+    (data.projects || []).forEach((p) =>
+      idx.push({
+        label: p.title,
+        sub: [p.short, (p.tech || []).join(", ")].filter(Boolean).join(" · "),
+        section: "projects",
+        type: "Project",
+      }),
+    );
+    // Education
+    (data.education || []).forEach((e) =>
+      idx.push({
+        label: e.degree,
+        sub: `${e.school || ""} ${e.period || ""}`.trim(),
+        section: "education",
+        type: "Education",
+      }),
+    );
+    // Languages
+    (data.languages || []).forEach((l) =>
+      idx.push({
+        label: l.name,
+        sub: l.level,
+        section: "languages",
+        type: "Language",
+      }),
+    );
+    return idx;
+  })();
+
+  // Results grouped by section, so the dropdown reads "section-wise".
+  const groupedResults = (() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    const matched = searchIndex.filter(
+      (item) =>
+        (item.label || "").toLowerCase().includes(q) ||
+        (item.sub || "").toLowerCase().includes(q),
+    );
+    // Preserve a sensible section order
+    const order = [
+      "home",
+      "skills",
+      "experience",
+      "projects",
+      "education",
+      "languages",
+      "contact",
+    ];
+    const sectionLabel = {
+      home: "Profile",
+      skills: "Skills",
+      experience: "Experience",
+      projects: "Projects",
+      education: "Education",
+      languages: "Languages",
+      contact: "Contact",
+    };
+    const groups = {};
+    for (const item of matched) {
+      if (!groups[item.section]) groups[item.section] = [];
+      groups[item.section].push(item);
+    }
+    return order
+      .filter((s) => groups[s] && groups[s].length)
+      .map((s) => ({
+        section: s,
+        label: sectionLabel[s] || s,
+        items: groups[s],
+      }));
+  })();
 
   const initials = (profile?.name || "ME")
     .split(" ")
@@ -38,16 +144,43 @@ export default function Topbar({ profile, authed, onLogin, onLogout }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // close dropdown on outside click
+  // close dropdowns on outside click
   useEffect(() => {
     const onClick = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setMenuOpen(false);
       }
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setSearchOpen(false);
+      }
     };
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
+
+  // Scroll to (or navigate to) a section. Used by nav clicks + search results.
+  const goToSection = (section) => {
+    setSearchOpen(false);
+    setQuery("");
+    const TOPBAR_OFFSET = 80;
+    const doScroll = () => {
+      const target =
+        section === "home"
+          ? 0
+          : (() => {
+              const el = document.getElementById(section);
+              return el ? Math.max(0, el.offsetTop - TOPBAR_OFFSET) : 0;
+            })();
+      window.scrollTo({ top: target, behavior: "smooth" });
+    };
+    if (pathname !== "/") {
+      window.location.href = `/#${section}`;
+      // after navigation, give the page time to mount then scroll
+      setTimeout(doScroll, 600);
+    } else {
+      doScroll();
+    }
+  };
 
   const nav = [
     { id: "home", label: "Home", Icon: Icon.Home },
@@ -115,9 +248,55 @@ export default function Topbar({ profile, authed, onLogin, onLogout }) {
       <div className="topbar-inner">
         <div className="brand">
           <div className="brand-logo">{initials}</div>
-          <div className="search-wrap">
+          <div className="search-wrap" ref={searchRef}>
             <Icon.Search size={16} className="search-ico" />
-            <input type="text" className="search-box" placeholder="Search..." />
+            <input
+              type="text"
+              className="search-box"
+              placeholder="Search skills, projects…"
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setSearchOpen(true);
+              }}
+              onFocus={() => setSearchOpen(true)}
+            />
+            {searchOpen && query.trim() && (
+              <div className="search-results">
+                {groupedResults.length === 0 ? (
+                  <div className="search-no-results">
+                    No matches for "{query}"
+                  </div>
+                ) : (
+                  groupedResults.map((group) => (
+                    <div key={group.section} className="search-group">
+                      <div className="search-group-head">
+                        {group.label}
+                        <span className="search-group-count">
+                          {group.items.length}
+                        </span>
+                      </div>
+                      {group.items.map((item, i) => (
+                        <button
+                          key={i}
+                          className="search-result-item"
+                          onClick={() => goToSection(item.section)}
+                        >
+                          <span className="search-result-title">
+                            {item.label}
+                          </span>
+                          {item.sub && (
+                            <span className="search-result-desc">
+                              {item.sub}
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </div>
 
