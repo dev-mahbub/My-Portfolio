@@ -51,11 +51,29 @@ async function saveFile(file, type) {
     return { url: blob.url, name: unique, buffer };
   }
 
-  // Local filesystem fallback (dev only)
+  // Local filesystem fallback (dev only). On Vercel this throws EROFS.
   if (!fs.existsSync(UPLOADS_DIR))
     fs.mkdirSync(UPLOADS_DIR, { recursive: true });
   const dest = path.join(UPLOADS_DIR, unique);
-  fs.writeFileSync(dest, buffer);
+  try {
+    fs.writeFileSync(dest, buffer);
+  } catch (e) {
+    if (
+      e &&
+      (e.code === "EROFS" || e.code === "EACCES" || e.code === "EPERM")
+    ) {
+      const err = new Error(
+        "Uploads are not configured on this server. " +
+          "Connect a Vercel Blob store to your project (Project → Storage → " +
+          "Create → Blob → Connect) so that BLOB_READ_WRITE_TOKEN is set, " +
+          "then redeploy. Error: " +
+          e.code,
+      );
+      err.code = "NO_STORAGE_CONFIGURED";
+      throw err;
+    }
+    throw e;
+  }
   return { url: `/uploads/${unique}`, name: unique, buffer };
 }
 
@@ -109,9 +127,12 @@ export async function POST(request) {
 
     return NextResponse.json({ ok: true, url: publicUrl, name: storedName });
   } catch (e) {
+    const status = e.code === "NO_STORAGE_CONFIGURED" ? 503 : 500;
     return NextResponse.json(
       { error: "Upload failed: " + e.message },
-      { status: 500 },
+      {
+        status,
+      },
     );
   }
 }

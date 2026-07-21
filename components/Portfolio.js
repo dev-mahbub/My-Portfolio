@@ -87,7 +87,13 @@ export default function Portfolio({ initialData, initialAuthed = false }) {
         return null;
       }
       if (!res.ok) {
-        showToast("Upload failed", true);
+        // Surface the real server error (e.g. Blob not configured) to the user
+        let detail = "Upload failed";
+        try {
+          const ej = await res.json();
+          if (ej?.error) detail = ej.error;
+        } catch {}
+        showToast(detail, true);
         return null;
       }
       const json = await res.json();
