@@ -256,6 +256,13 @@
   border-radius: 2px;
 }
 
+/* ===== Nav: Skills hidden on desktop, shown on mobile =====
+   Targets the 2nd nav <a> inside .topnav (Home=1, Skills=2, ...).
+   Hidden on large screens, displayed on small screens (<= 900px). */
+.topnav > a:nth-child(2) {
+  display: none;
+}
+
 /* ===== Responsive: hide search on mobile ===== */
 @media (max-width: 900px) {
   .search-wrap {
@@ -267,5 +274,9 @@
   }
   .nav-label {
     font-size: 0.65rem;
+  }
+  /* Show Skills nav on mobile */
+  .topnav > a:nth-child(2) {
+    display: flex;
   }
 }
