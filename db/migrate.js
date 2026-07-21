@@ -21,10 +21,17 @@ if (!DATABASE_URL || DATABASE_URL.includes("YOUR_PASSWORD")) {
   process.exit(1);
 }
 
+// Enable SSL for remote hosts (Neon and other managed providers require it).
+function resolveSsl(url) {
+  const wantsSsl = /sslmode\s*=\s*(require|verify-ca|verify-full)/i.test(url);
+  const isRemote = !/localhost|127\.0\.0\.1|0\.0\.0\.0/.test(url);
+  return wantsSsl || isRemote ? { rejectUnauthorized: false } : false;
+}
+
 // We connect to the default 'postgres' DB first to ensure the target DB exists.
 function parseConn(url) {
   try {
-    const u = new URL(DATABASE_URL);
+    const u = new URL(url);
     return {
       host: u.hostname,
       port: u.port || "5432",
@@ -41,8 +48,9 @@ async function ensureDatabase() {
   const cfg = parseConn(DATABASE_URL);
   if (!cfg) throw new Error("Invalid DATABASE_URL");
   const targetDb = cfg.database;
+  const ssl = resolveSsl(DATABASE_URL);
   // connect to maintenance db
-  const admin = new Pool({ ...cfg, database: "postgres" });
+  const admin = new Pool({ ...cfg, database: "postgres", ssl });
   try {
     const exists = await admin.query(
       "SELECT 1 FROM pg_database WHERE datname = $1",
@@ -60,7 +68,8 @@ async function ensureDatabase() {
 }
 
 async function runMigrations() {
-  const pool = new Pool({ connectionString: DATABASE_URL });
+  const ssl = resolveSsl(DATABASE_URL);
+  const pool = new Pool({ connectionString: DATABASE_URL, ssl });
   const migrationsDir = path.join(process.cwd(), "db", "migrations");
   const files = fs
     .readdirSync(migrationsDir)
