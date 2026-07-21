@@ -3,10 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Topbar from "@/components/Topbar";
-import OnlineCvCard from "@/components/OnlineCvCard";
-import CoverLetterCard from "@/components/CoverLetterCard";
 import AnalyticsCard from "@/components/AnalyticsCard";
-import EditPanel from "@/components/EditPanel";
 import Toast from "@/components/Toast";
 import Icon from "@/components/Icons";
 
@@ -14,9 +11,8 @@ import Icon from "@/components/Icons";
  * Admin Dashboard (separate page, /dashboard).
  *
  * Contains — admin only:
- *   • Online CV editor (dashboard_content.cv_text)
- *   • Cover Letter editor (dashboard_content.cover_letter)
- *   • Downloadable CV management (public_files) — separate from online text
+ *   • Downloadable CV management (public_files) — served by the public
+ *     "View CV" button
  *   • Visitor Analytics (visitor_tracking)
  *   • Change Credentials (via Topbar dropdown)
  *
@@ -24,9 +20,8 @@ import Icon from "@/components/Icons";
  */
 export default function Dashboard({ initialData = {}, initialAuthed = false }) {
   const router = useRouter();
-  const [data, setData] = useState(initialData);
+  const [data] = useState(initialData);
   const [authed, setAuthed] = useState(initialAuthed);
-  const [editing, setEditing] = useState(null);
   const [toast, setToast] = useState(null);
   const [cvFile, setCvFile] = useState(initialData?.downloadCv || null);
   const [uploadingCv, setUploadingCv] = useState(false);
@@ -42,26 +37,6 @@ export default function Dashboard({ initialData = {}, initialAuthed = false }) {
       router.replace("/");
     }
   }, [initialAuthed, router]);
-
-  const saveSection = useCallback(
-    async (section, value) => {
-      try {
-        const res = await fetch(`/api/portfolio/${section}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ value }),
-        });
-        if (!res.ok) throw new Error("Save failed");
-        const json = await res.json();
-        setData(json.data);
-        showToast("Saved");
-        setEditing(null);
-      } catch (e) {
-        showToast("Save failed", true);
-      }
-    },
-    [showToast],
-  );
 
   // Upload a standalone downloadable CV PDF (public_files)
   const handleCvUpload = async (e) => {
@@ -107,12 +82,12 @@ export default function Dashboard({ initialData = {}, initialAuthed = false }) {
               Dashboard
             </h1>
             <p className="muted" style={{ fontSize: "0.85rem" }}>
-              Manage your online CV text, cover letter, downloadable CV PDF, and
-              visitor analytics. Public visitors cannot see this page.
+              Manage your downloadable CV PDF and visitor analytics. Public
+              visitors cannot see this page.
             </p>
           </div>
 
-          {/* === Downloadable CV (standalone PDF, separate from online text) === */}
+          {/* === Downloadable CV (standalone PDF) === */}
           <section className="card">
             <div className="card-head">
               <h2>
@@ -124,9 +99,8 @@ export default function Dashboard({ initialData = {}, initialAuthed = false }) {
               className="muted"
               style={{ fontSize: "0.8rem", marginBottom: "0.6rem" }}
             >
-              This is the standalone PDF served by the public{" "}
-              <strong>"View CV"</strong> button. It is completely independent of
-              the editable Online CV text below.
+              This is the standalone PDF shown when a visitor clicks the public{" "}
+              <strong>"View CV"</strong> button — it opens in a new browser tab.
             </p>
 
             {cvFile?.url ? (
@@ -165,33 +139,10 @@ export default function Dashboard({ initialData = {}, initialAuthed = false }) {
             </label>
           </section>
 
-          {/* === Online CV text editor === */}
-          <OnlineCvCard
-            cvText={data.cv_text}
-            authed
-            onEdit={() => setEditing("cv_text")}
-          />
-
-          {/* === Cover Letter editor === */}
-          <CoverLetterCard
-            coverLetter={data.cover_letter}
-            authed
-            onEdit={() => setEditing("cover_letter")}
-          />
-
           {/* === Visitor Analytics === */}
           <AnalyticsCard authed />
         </div>
       </main>
-
-      {editing && (
-        <EditPanel
-          section={editing}
-          data={data}
-          onClose={() => setEditing(null)}
-          onSave={saveSection}
-        />
-      )}
 
       {toast && <Toast message={toast.msg} isError={toast.isError} />}
     </>

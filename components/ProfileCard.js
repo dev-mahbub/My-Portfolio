@@ -3,41 +3,16 @@ import Icon from "@/components/Icons";
 /**
  * ProfileCard
  *
- * "Download CV" button serves the STANDALONE downloadable PDF
- * (public_files via /api/cv/download) — completely independent of the
- * editable online CV text (dashboard_content.cv_text).
+ * "View CV" button opens the public-viewable CV (PDF) in a new browser tab.
+ * It streams the PDF inline via /api/cv/view so the browser's built-in
+ * PDF viewer renders it. This is completely independent of the editable
+ * online CV text (dashboard_content.cv_text).
  */
 export default function ProfileCard({ profile, authed, onContact, onEdit }) {
   const stats = profile?.stats || {};
 
-  const handleDownloadCv = async () => {
-    try {
-      const res = await fetch("/api/cv/download");
-      if (!res.ok) throw new Error("Download failed");
-      const json = await res.json();
-      if (json.source === "uploaded" && json.url) {
-        // serve the uploaded standalone PDF
-        window.open(json.url, "_blank", "noopener,noreferrer");
-      } else if (json.source === "generated" && json.base64) {
-        // on-the-fly ATS-friendly PDF
-        const bin = atob(json.base64);
-        const arr = new Uint8Array(bin.length);
-        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-        const blob = new Blob([arr], { type: "application/pdf" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = json.filename || "CV.pdf";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-      } else {
-        throw new Error("No CV available");
-      }
-    } catch (e) {
-      alert("Could not download CV: " + e.message);
-    }
+  const handleViewCv = () => {
+    window.open("/api/cv/view", "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -66,8 +41,8 @@ export default function ProfileCard({ profile, authed, onContact, onEdit }) {
         <div className="action-buttons">
           <button
             className="btn btn-primary"
-            onClick={handleDownloadCv}
-            title="View / download CV (PDF)"
+            onClick={handleViewCv}
+            title="View CV (opens in a new tab)"
           >
             <Icon.FileText size={18} /> View CV
           </button>
