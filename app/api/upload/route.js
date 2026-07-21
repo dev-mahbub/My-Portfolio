@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { NextResponse } from "next/server";
+import { put } from "@vercel/blob";
 import { isAuthenticated, getCurrentUser } from "@/lib/auth";
 import { setActiveCv } from "@/lib/publicFiles";
 
@@ -13,6 +14,50 @@ const ALLOWED = {
   cover: ["image/jpeg", "image/png", "image/webp", "image/gif"],
   avatar: ["image/jpeg", "image/png", "image/webp"],
 };
+
+/**
+ * Whether Vercel Blob is configured. When true we upload to Blob storage
+ * (required on Vercel/serverless where the filesystem is read-only).
+ * When false (local dev without a Blob token) we fall back to disk.
+ */
+function isBlobConfigured() {
+  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+}
+
+/**
+ * Save a file. Uses Vercel Blob in production, falls back to the local
+ * `public/uploads` directory in development.
+ *
+ * @returns {Promise<{url: string, name: string, buffer: Buffer}>}
+ */
+async function saveFile(file, type) {
+  const safeName = String(file.name).replace(/[^a-zA-Z0-9._-]/g, "_");
+  const unique = `${Date.now()}-${safeName}`;
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  if (isBlobConfigured()) {
+    const pathname =
+      type === "cv"
+        ? `cv/${unique}`
+        : type === "avatar"
+          ? `avatars/${unique}`
+          : `images/${unique}`;
+    const blob = await put(pathname, buffer, {
+      access: "public",
+      contentType: file.type || undefined,
+      addRandomSuffix: false,
+    });
+    return { url: blob.url, name: unique, buffer };
+  }
+
+  // Local filesystem fallback (dev only)
+  if (!fs.existsSync(UPLOADS_DIR))
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  const dest = path.join(UPLOADS_DIR, unique);
+  fs.writeFileSync(dest, buffer);
+  return { url: `/uploads/${unique}`, name: unique, buffer };
+}
 
 // POST /api/upload  (multipart/form-data) — auth required
 // fields:
@@ -40,18 +85,11 @@ export async function POST(request) {
       );
     }
 
-    if (!fs.existsSync(UPLOADS_DIR))
-      fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-
-    const safeName = String(file.name).replace(/[^a-zA-Z0-9._-]/g, "_");
-    const unique = `${Date.now()}-${safeName}`;
-    const dest = path.join(UPLOADS_DIR, unique);
-
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    fs.writeFileSync(dest, buffer);
-
-    const publicUrl = `/uploads/${unique}`;
+    const {
+      url: publicUrl,
+      name: storedName,
+      buffer,
+    } = await saveFile(file, type);
 
     // ===== Dual-CV Isolation =====
     // When a CV PDF is uploaded, register it as the standalone
@@ -60,7 +98,7 @@ export async function POST(request) {
       const user = await getCurrentUser();
       const userId = user?.sub ? Number(user.sub) || null : null;
       await setActiveCv({
-        filename: unique,
+        filename: storedName,
         originalName: file.name,
         url: publicUrl,
         mimeType: ctype,
@@ -69,7 +107,7 @@ export async function POST(request) {
       });
     }
 
-    return NextResponse.json({ ok: true, url: publicUrl, name: unique });
+    return NextResponse.json({ ok: true, url: publicUrl, name: storedName });
   } catch (e) {
     return NextResponse.json(
       { error: "Upload failed: " + e.message },

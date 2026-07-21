@@ -13,6 +13,7 @@
     "db:setup": "npm run db:migrate && npm run db:seed"
   },
   "dependencies": {
+    "@vercel/blob": "^2.6.1",
     "bcryptjs": "^3.0.3",
     "next": "14.2.35",
     "pdf-lib": "^1.17.1",
