@@ -1,0 +1,75 @@
+/**
+ * modal.css
+ * Overlay modals (edit panel, login, change credentials), login-modal tweaks,
+ * online CV text block, and the toast notifications.
+ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: grid;
+  place-items: center;
+  z-index: 200;
+  padding: 1rem;
+}
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 460px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal h2 {
+  margin-bottom: 0.5rem;
+}
+
+/* Login modal */
+.login-modal {
+  max-width: 380px;
+}
+.login-modal h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Online CV text block (editable, separate from downloadable PDF) */
+.cv-text {
+  background: #fafbfc;
+  border: 1px solid var(--li-border);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin: 0.5rem 0 0.4rem;
+  font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--li-text);
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #057642;
+  color: #fff;
+  padding: 0.7rem 1.2rem;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  z-index: 300;
+}
+.toast.error {
+  background: var(--li-red);
+}

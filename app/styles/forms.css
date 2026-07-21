@@ -1,0 +1,72 @@
+/**
+ * forms.css
+ * Edit-mode form controls: fields, inputs, textareas, selects,
+ * form action rows, edit rows, and upload boxes/previews.
+ */
+
+.field {
+  margin-bottom: 0.6rem;
+}
+.field label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--li-text-soft);
+  margin-bottom: 0.2rem;
+}
+.input,
+.textarea,
+.select {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.88rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--li-border);
+  border-radius: 6px;
+  outline: none;
+  background: #fff;
+}
+.input:focus,
+.textarea:focus,
+.select:focus {
+  border-color: var(--li-blue);
+}
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+.edit-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+.edit-row .input {
+  flex: 1;
+  min-width: 120px;
+}
+.upload-box {
+  border: 2px dashed var(--li-border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  text-align: center;
+  cursor: pointer;
+  background: #fafbfc;
+  font-size: 0.85rem;
+  color: var(--li-text-soft);
+}
+.upload-box:hover {
+  border-color: var(--li-blue);
+  color: var(--li-blue);
+}
+.upload-preview {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}

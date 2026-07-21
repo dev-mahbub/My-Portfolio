@@ -12,8 +12,6 @@ const SECTION_TITLES = {
   highlights: "Edit Highlights",
   contact: "Edit Contact",
   languages: "Edit Languages",
-  cv_text: "Edit Online CV Text",
-  cover_letter: "Edit Cover Letter",
 };
 
 export default function EditPanel({
@@ -75,70 +73,8 @@ export default function EditPanel({
         {section === "contact" && (
           <ContactEditor data={data.contact} onSave={onSave} />
         )}
-        {section === "cv_text" && (
-          <TextEditor
-            title="Online CV Text"
-            description="This is the editable online CV shown on the public page. It does NOT affect the downloadable PDF."
-            data={data.cv_text}
-            onSave={onSave}
-            section="cv_text"
-          />
-        )}
-        {section === "cover_letter" && (
-          <TextEditor
-            title="Cover Letter"
-            description="Global-standard cover letter template. Use placeholders like [Company Name] and [Job Title]."
-            data={data.cover_letter}
-            onSave={onSave}
-            section="cover_letter"
-          />
-        )}
       </div>
     </div>
-  );
-}
-
-/* ============ GENERIC TEXT EDITOR (cv_text / cover_letter) ============ */
-function TextEditor({ data = "", onSave, section, description }) {
-  const [value, setValue] = useState(data);
-  useEffect(() => setValue(data), [data]);
-
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSave(section, value);
-      }}
-    >
-      {description && (
-        <p
-          className="muted"
-          style={{ fontSize: "0.8rem", marginBottom: "0.5rem" }}
-        >
-          {description}
-        </p>
-      )}
-      <div className="field">
-        <textarea
-          className="textarea"
-          style={{ minHeight: 280, fontFamily: "monospace" }}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-        />
-      </div>
-      <div className="form-actions">
-        <button
-          type="button"
-          className="btn btn-ghost"
-          onClick={() => setValue(data)}
-        >
-          Reset
-        </button>
-        <button type="submit" className="btn btn-primary">
-          Save
-        </button>
-      </div>
-    </form>
   );
 }
 

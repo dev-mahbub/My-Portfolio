@@ -1,0 +1,58 @@
+/**
+ * timeline.css
+ * Vertical timeline used by the Experience and Education cards.
+ */
+
+.timeline {
+  position: relative;
+  padding-left: 1.25rem;
+}
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--li-border);
+}
+.timeline-item {
+  position: relative;
+  padding-bottom: 1rem;
+}
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+.timeline-dot {
+  position: absolute;
+  left: -1.25rem;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--li-blue);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px var(--li-border);
+}
+.timeline-content {
+  padding-left: 0.25rem;
+}
+.timeline-role {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.timeline-company {
+  font-size: 0.82rem;
+  color: var(--li-blue);
+  margin: 0.1rem 0;
+}
+.timeline-period {
+  font-size: 0.76rem;
+  color: var(--li-text-soft);
+  margin-bottom: 0.3rem;
+}
+.timeline-desc {
+  font-size: 0.85rem;
+  color: var(--li-text-soft);
+  margin: 0;
+}

@@ -1,0 +1,56 @@
+/**
+ * skills.css
+ * Skills card: tag list, active tag state, and the skill detail panel
+ * (progress bar + description + related projects).
+ */
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.skill-tag {
+  background: rgba(112, 181, 249, 0.2);
+  color: var(--li-blue-dark);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.skill-tag:hover {
+  background: rgba(112, 181, 249, 0.4);
+}
+.skill-tag.active {
+  background: var(--li-blue);
+  color: #fff;
+}
+.skill-detail {
+  margin-top: 1rem;
+  padding: 0.85rem;
+  border: 1px solid var(--li-border);
+  border-radius: 8px;
+  position: relative;
+  background: #fafbfc;
+}
+.skill-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.5rem 0;
+}
+.skill-bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+.skill-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--li-green), #4caf50);
+  transition: width 0.6s ease;
+}

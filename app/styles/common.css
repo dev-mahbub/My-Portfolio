@@ -1,0 +1,217 @@
+/**
+ * common.css
+ * Base reset, typography, CSS variables, buttons, and shared utility classes
+ * used across the entire app.
+ */
+
+a {
+  color: var(--li-blue);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+button {
+  font-family: inherit;
+}
+
+/* ===== Generic card ===== */
+.card {
+  background: var(--li-card);
+  border: 1px solid var(--li-border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 1rem 1.1rem;
+  overflow: hidden;
+}
+.card-overflow {
+  overflow-y: auto;
+  height: auto;
+  max-height: 220px;
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.card-head h2 {
+  flex: 1;
+}
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: 50%;
+}
+.icon-btn:hover {
+  background: var(--li-hover);
+}
+
+/* ===== Buttons ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border: 1px solid var(--li-blue);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+  font-family: inherit;
+  text-decoration: none;
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--li-blue);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--li-blue-dark);
+  text-decoration: none;
+}
+.btn-outline {
+  background: #fff;
+  color: var(--li-blue);
+}
+.btn-outline:hover:not(:disabled) {
+  background: rgba(112, 181, 249, 0.15);
+  text-decoration: none;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--li-text-soft);
+  border: none;
+  padding: 0.35rem 0.5rem;
+}
+.btn-ghost:hover {
+  background: var(--li-hover);
+}
+.btn-danger {
+  background: #fff;
+  color: var(--li-red);
+  border-color: var(--li-red);
+}
+.btn-danger:hover:not(:disabled) {
+  background: rgba(204, 31, 31, 0.08);
+  text-decoration: none;
+}
+.btn-sm {
+  font-size: 0.78rem;
+  padding: 0.35rem 0.7rem;
+}
+
+/* ===== SVG icons ===== */
+.svg-icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.inline-ico {
+  margin-right: 0.35rem;
+  vertical-align: -3px;
+}
+
+/* ===== Shared lists (highlights / contact / languages) ===== */
+.highlights,
+.contact-list,
+.lang-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.highlights li {
+  font-size: 0.88rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--li-border);
+}
+.highlights li:last-child {
+  border-bottom: none;
+}
+.contact-list li {
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+.lang-list li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.86rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--li-border);
+}
+.lang-list li:last-child {
+  border-bottom: none;
+}
+.lang-list span {
+  color: var(--li-text-soft);
+  font-size: 0.8rem;
+}
+
+/* ===== Contact row (icon + link) ===== */
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+.contact-ico {
+  color: var(--li-text-soft);
+  flex-shrink: 0;
+}
+
+/* ===== Footer ===== */
+.footer {
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 0.8rem;
+  color: var(--li-text-soft);
+}
+
+/* ===== Utility classes ===== */
+.muted {
+  color: var(--li-text-soft);
+}
+.row-gap {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.spacer {
+  flex: 1;
+}
+.badge-edit {
+  font-size: 0.68rem;
+  background: var(--li-blue);
+  color: #fff;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
